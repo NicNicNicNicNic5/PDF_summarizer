@@ -35,6 +35,8 @@ st.markdown(
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
 if uploaded_file is not None:
+    done_uploading = False
+    done_analyzing = False
     # Save the uploaded file to a temporary location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
         temp_file_path = temp_file.name
@@ -124,6 +126,7 @@ if done_uploading == True:
                 | StrOutputParser()
             )
         done_analyzing = True
+        done_uploading = False
 
 if done_analyzing == True:
     # Create text box for user
