@@ -131,9 +131,9 @@ if st.button("Analyze PDF"):
     # done_analyzing = True
 
 # if done_analyzing == True:
-# Create text box for user
-text = st.text_area("Text to analyze: ")
+    # Create text box for user
+    text = st.text_area("Text to analyze: ")
 
-# Invoke LLM
-if st.button("Generate Responses"):
-    st.markdown(rag_chain.invoke(text))
+    # Invoke LLM
+    if st.button("Generate Responses"):
+        st.markdown(rag_chain.invoke(text))
