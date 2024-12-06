@@ -69,7 +69,7 @@ if done_uploading == True:
             )
 
             # Generate embeddings for the document chunks
-            vectors = np.array([embeddings.embed(doc.page_content) for doc in splits], dtype=np.float32)
+            vectors = np.array([embeddings(doc.page_content) for doc in splits], dtype=np.float32)
 
             # Create a FAISS index
             dimension = vectors.shape[1]  # Vector dimension
@@ -109,7 +109,7 @@ if done_uploading == True:
 
             # Define a function to retrieve the most similar documents using FAISS
             def retrieve_docs(query):
-                query_vector = embeddings.embed(query).reshape(1, -1)
+                query_vector = embeddings(query).reshape(1, -1)
                 _, indices = index.search(query_vector, k=5)  # Change `k` for more/less results
                 return [splits[i] for i in indices[0]]
 
