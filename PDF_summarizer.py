@@ -118,8 +118,7 @@ if uploaded_file is not None:
             )
 
             # Invoke LLM
-            if st.button("Generate Responses"):
-                st.markdown(rag_chain.invoke(text))
+            st.markdown(rag_chain.invoke(text))
 
             # Delete the temporary file after processing
             if os.path.exists(temp_file_path):
