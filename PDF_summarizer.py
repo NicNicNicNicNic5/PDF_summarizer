@@ -21,7 +21,7 @@ st.set_page_config(layout='wide')
 st.markdown(
     """
     <h1 style="text-align: center; color: white;">
-        PDF Summarizer 2
+        PDF Summarizer
     </h1>
     """,
     unsafe_allow_html=True
@@ -111,17 +111,14 @@ if uploaded_file is not None:
             | StrOutputParser()
         )
 
-        # Create text box for user
-        text = st.text_area("Text to analyze: ")
-
-        # Invoke LLM
-        res = rag_chain.invoke(text)
-
-        # Print output
-        if st.button("Generate Responses"):
-            st.markdown(res)
-
     finally:
         # Delete the temporary file after processing
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
+
+# Create text box for user
+text = st.text_area("Text to analyze: ")
+
+# Invoke LLM
+if st.button("Generate Responses"):
+    st.markdown(rag_chain.invoke(text))
