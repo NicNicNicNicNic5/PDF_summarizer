@@ -70,12 +70,13 @@ if done_uploading == True:
             # default_server.start()
             # connections.connect(host='127.0.0.1', port=default_server.listen_port)
             # connections.connect(host='localhost', port=19530)
-            
+
             connections.disconnect(alias="default")
             milvus_host = os.getenv("MILVUS_HOST", "localhost")
             milvus_port = os.getenv("MILVUS_PORT", "19530")
 
             connections.connect(host=milvus_host, port=milvus_port)
+            connections.connect(alias="new_connection", host=milvus_host, port=milvus_port)
 
             # Create Vector Database
             vectordb = Milvus.from_documents(
