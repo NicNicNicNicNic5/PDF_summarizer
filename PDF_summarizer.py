@@ -50,71 +50,77 @@ if uploaded_file is not None:
         # Split texts into chunks
         splits = text_splitter.split_documents(docs)
 
-        # Start local connection to Milvus
-        URI = "http://127.0.0.1:19530"
-        default_server.start()
-        connections.connect(host='127.0.0.1', port=default_server.listen_port)
-
-        # Create Vector Database
-        vectordb = Milvus.from_documents(
-            documents=splits,
-            embedding=HuggingFaceEmbeddings(
-                model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
-            ),
-            collection_name="dtsense_streamlit",
-            connection_args={"uri": URI},
-        )
-
-        # Stop connection to Milvus
-        default_server.stop()
-
-        # Get API KEY from .env
-        load_dotenv()
-
-        # Use model with Groq
-        llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ["GROQ_API_KEY"])
-
-        # Define the prompt template for generating AI responses
-        PROMPT_TEMPLATE = """
-        Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
-        Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
-        If you don't know the answer, just say that you don't know, don't try to make up an answer.
-        <context>
-        {context}
-        </context>
-
-        <question>
-        {question}
-        </question>
-
-        The response should be specific and use statistics or numbers when possible.
-
-        Assistant:"""
-
-        # Create a PromptTemplate instance with the defined template and input variables
-        prompt = PromptTemplate(
-            template=PROMPT_TEMPLATE, input_variables=["context", "question"]
-        )
-
-        # Convert the vector store to a retriever
-        retriever = vectordb.as_retriever()
-
-        # Define a function to format the retrieved documents
-        def format_docs(docs):
-            return "\n\n".join(doc.page_content for doc in docs)
-        
-        # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
-        rag_chain = (
-            {"context": retriever | format_docs, "question": RunnablePassthrough()}
-            | prompt
-            | llm
-            | StrOutputParser()
-        )
-
     finally:
         # Delete the temporary file after processing
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
+
+if st.button("Analyze PDF"):
+    # Start local connection to Milvus
+    URI = "http://127.0.0.1:19530"
+    default_server.start()
+    connections.connect(host='127.0.0.1', port=default_server.listen_port)
+
+    # Create Vector Database
+    vectordb = Milvus.from_documents(
+        documents=splits,
+        embedding=HuggingFaceEmbeddings(
+            model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
+        ),
+        collection_name="dtsense_streamlit",
+        connection_args={"uri": URI},
+    )
+
+    # Stop connection to Milvus
+    default_server.stop()
+
+    # Get API KEY from .env
+    load_dotenv()
+
+    # Use model with Groq
+    llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ["GROQ_API_KEY"])
+
+    # Define the prompt template for generating AI responses
+    PROMPT_TEMPLATE = """
+    Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
+    Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
+    If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    <context>
+    {context}
+    </context>
+
+    <question>
+    {question}
+    </question>
+
+    The response should be specific and use statistics or numbers when possible.
+
+    Assistant:"""
+
+    # Create a PromptTemplate instance with the defined template and input variables
+    prompt = PromptTemplate(
+        template=PROMPT_TEMPLATE, input_variables=["context", "question"]
+    )
+
+    # Convert the vector store to a retriever
+    retriever = vectordb.as_retriever()
+
+    # Define a function to format the retrieved documents
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+    
+    # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
+    rag_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    # finally:
+    #     # Delete the temporary file after processing
+    #     if os.path.exists(temp_file_path):
+    #         os.remove(temp_file_path)
 
 # Create text box for user
 text = st.text_area("Text to analyze: ")
