@@ -68,9 +68,6 @@ if uploaded_file is not None:
         # Stop connection to Milvus
         default_server.stop()
 
-        # Delete the uploaded file
-
-
         # Get API KEY from .env
         load_dotenv()
 
