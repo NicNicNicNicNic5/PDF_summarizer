@@ -35,7 +35,6 @@ if uploaded_file is not None:
         temp_file_path = temp_file.name
         temp_file.write(uploaded_file.read())
 
-    try:
         # Use PyPDFLoader to read the content of the uploaded PDF
         loader = PyPDFLoader(temp_file_path)
         docs = loader.load()
@@ -121,8 +120,7 @@ if uploaded_file is not None:
             # Invoke LLM
             if st.button("Generate Responses"):
                 st.markdown(rag_chain.invoke(text))
-                
-    finally:
-        # Delete the temporary file after processing
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
+
+            # Delete the temporary file after processing
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
