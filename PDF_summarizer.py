@@ -27,96 +27,103 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# File uploader for PDF
-uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+if "task_completed" not in st.session_state:
+    st.session_state.task_completed = False
 
-if uploaded_file is not None:
-    # Save the uploaded file to a temporary location
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
-        temp_file_path = temp_file.name
-        temp_file.write(uploaded_file.read())
+if not st.session_state.task_completed:
+    # File uploader for PDF
+    uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
-    try:
-        # Use PyPDFLoader to read the content of the uploaded PDF
-        loader = PyPDFLoader(temp_file_path)
-        docs = loader.load()
+    if uploaded_file is not None:
+        # Save the uploaded file to a temporary location
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            temp_file_path = temp_file.name
+            temp_file.write(uploaded_file.read())
 
-        # Create splitter
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size = 1500,
-            chunk_overlap = 150
-        )
+        try:
+            # Use PyPDFLoader to read the content of the uploaded PDF
+            loader = PyPDFLoader(temp_file_path)
+            docs = loader.load()
 
-        # Split texts into chunks
-        splits = text_splitter.split_documents(docs)
+            # Create splitter
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size = 1500,
+                chunk_overlap = 150
+            )
 
-    finally:
-        # Delete the temporary file after processing
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
+            # Split texts into chunks
+            splits = text_splitter.split_documents(docs)
 
-if st.button("Analyze PDF"):
-    with st.spinner("Analyzing PDF...Please wait!"):
-    # Start local connection to Milvus
-        URI = "http://127.0.0.1:19530"
-        default_server.start()
-        connections.connect(host='127.0.0.1', port=default_server.listen_port)
+        finally:
+            # Delete the temporary file after processing
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
 
-        # Create Vector Database
-        vectordb = Milvus.from_documents(
-            documents=splits,
-            embedding=HuggingFaceEmbeddings(
-                model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
-            ),
-            collection_name="dtsense_streamlit",
-            connection_args={"uri": URI},
-        )
+    st.session_state.task_completed = True 
 
-        # Stop connection to Milvus
-        default_server.stop()
+if st.session_state.task_completed:
+    if st.button("Analyze PDF"):
+        with st.spinner("Analyzing PDF...Please wait!"):
+        # Start local connection to Milvus
+            URI = "http://127.0.0.1:19530"
+            default_server.start()
+            connections.connect(host='127.0.0.1', port=default_server.listen_port)
 
-        # Get API KEY from .env
-        load_dotenv()
+            # Create Vector Database
+            vectordb = Milvus.from_documents(
+                documents=splits,
+                embedding=HuggingFaceEmbeddings(
+                    model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
+                ),
+                collection_name="dtsense_streamlit",
+                connection_args={"uri": URI},
+            )
 
-        # Use model with Groq
-        llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ["GROQ_API_KEY"])
+            # Stop connection to Milvus
+            default_server.stop()
 
-        # Define the prompt template for generating AI responses
-        PROMPT_TEMPLATE = """
-        Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
-        Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
-        If you don't know the answer, just say that you don't know, don't try to make up an answer.
-        <context>
-        {context}
-        </context>
+            # Get API KEY from .env
+            load_dotenv()
 
-        <question>
-        {question}
-        </question>
+            # Use model with Groq
+            llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ["GROQ_API_KEY"])
 
-        The response should be specific and use statistics or numbers when possible.
+            # Define the prompt template for generating AI responses
+            PROMPT_TEMPLATE = """
+            Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
+            Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
+            If you don't know the answer, just say that you don't know, don't try to make up an answer.
+            <context>
+            {context}
+            </context>
 
-        Assistant:"""
+            <question>
+            {question}
+            </question>
 
-        # Create a PromptTemplate instance with the defined template and input variables
-        prompt = PromptTemplate(
-            template=PROMPT_TEMPLATE, input_variables=["context", "question"]
-        )
+            The response should be specific and use statistics or numbers when possible.
 
-        # Convert the vector store to a retriever
-        retriever = vectordb.as_retriever()
+            Assistant:"""
 
-        # Define a function to format the retrieved documents
-        def format_docs(docs):
-            return "\n\n".join(doc.page_content for doc in docs)
-        
-        # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
-        rag_chain = (
-            {"context": retriever | format_docs, "question": RunnablePassthrough()}
-            | prompt
-            | llm
-            | StrOutputParser()
-        )
+            # Create a PromptTemplate instance with the defined template and input variables
+            prompt = PromptTemplate(
+                template=PROMPT_TEMPLATE, input_variables=["context", "question"]
+            )
+
+            # Convert the vector store to a retriever
+            retriever = vectordb.as_retriever()
+
+            # Define a function to format the retrieved documents
+            def format_docs(docs):
+                return "\n\n".join(doc.page_content for doc in docs)
+            
+            # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
+            rag_chain = (
+                {"context": retriever | format_docs, "question": RunnablePassthrough()}
+                | prompt
+                | llm
+                | StrOutputParser()
+            )
 
     # finally:
     #     # Delete the temporary file after processing
