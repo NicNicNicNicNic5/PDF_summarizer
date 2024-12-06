@@ -21,7 +21,7 @@ st.set_page_config(layout='wide')
 st.markdown(
     """
     <h1 style="text-align: center; color: white;">
-        PDF Summarizer
+        PDF Summarizer 2
     </h1>
     """,
     unsafe_allow_html=True
