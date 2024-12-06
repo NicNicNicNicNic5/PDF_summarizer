@@ -66,7 +66,7 @@ if done_uploading == True:
     if st.button("Analyze PDF"):
         with st.spinner("Analyzing PDF...Please wait!"):
         # Start local connection to Milvus
-            URI = "http://127.0.0.1:19530"
+            URI = "http://localhost:19530"
             # default_server.start()
             # connections.connect(host='127.0.0.1', port=default_server.listen_port)
             # connections.connect(host='localhost', port=19530)
