@@ -7,7 +7,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
 import os
 from langchain_groq import ChatGroq
-from milvus import default_server
+# from milvus import default_server
 from pymilvus import connections
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import PromptTemplate
@@ -89,7 +89,7 @@ if done_uploading == True:
             )
 
             # Stop connection to Milvus
-            default_server.stop()
+            # default_server.stop()
 
             # Get API KEY from .env
             load_dotenv()
