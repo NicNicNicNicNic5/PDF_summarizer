@@ -55,31 +55,7 @@ if uploaded_file is not None:
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
 
-# Button CSS
-st.markdown(
-    """
-    <style>
-    .centered-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-# Button HTML
-st.markdown(
-    """
-    <div class="centered-button">
-        <button onclick="document.querySelector('button').click()">Analyze PDF</button>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-if st.button("Analyze PDF", key="hidden_button"):
+if st.button("Analyze PDF"):
     with st.spinner("Analyzing PDF...Please wait!"):
     # Start local connection to Milvus
         URI = "http://127.0.0.1:19530"
