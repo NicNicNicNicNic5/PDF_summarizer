@@ -67,9 +67,14 @@ if done_uploading == True:
         with st.spinner("Analyzing PDF...Please wait!"):
         # Start local connection to Milvus
             URI = "http://127.0.0.1:19530"
-            default_server.start()
+            # default_server.start()
             # connections.connect(host='127.0.0.1', port=default_server.listen_port)
-            connections.connect(host='localhost', port=19530)
+            # connections.connect(host='localhost', port=19530)
+
+            milvus_host = os.getenv("MILVUS_HOST", "127.0.0.1")
+            milvus_port = os.getenv("MILVUS_PORT", "19530")
+
+            connections.connect(host=milvus_host, port=milvus_port)
 
             # Create Vector Database
             vectordb = Milvus.from_documents(
