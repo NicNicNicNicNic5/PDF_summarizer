@@ -84,10 +84,10 @@ if done_uploading == True:
             load_dotenv()
 
             # Access API KEY
-            groq_api_key = os.getenv("GROQ_API_KEY")
+            # groq_api_key = os.getenv("GROQ_API_KEY")
 
             # Use model with Groq
-            llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ["groq_api_key"])
+            llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ[os.getenv("GROQ_API_KEY")])
 
             # Define the prompt template for generating AI responses
             PROMPT_TEMPLATE = """
