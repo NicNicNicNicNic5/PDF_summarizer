@@ -98,7 +98,8 @@ if uploaded_file is not None:
 
             # Define a function to retrieve the most similar documents using FAISS
             def retrieve_docs(query):
-                query_vector = embeddings.embed_documents([query]).reshape(1, -1)
+                # Ensure the output is converted to a NumPy array
+                query_vector = np.array(embeddings.embed_documents([query])).reshape(1, -1)
                 _, indices = index.search(query_vector, k=5)  # Change `k` for more/less results
                 return [splits[i] for i in indices[0]]
 
