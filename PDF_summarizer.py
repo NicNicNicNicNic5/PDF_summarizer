@@ -34,8 +34,6 @@ st.markdown(
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
 if uploaded_file is not None:
-    done_uploading = False
-    done_analyzing = False
     # Save the uploaded file to a temporary location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
         temp_file_path = temp_file.name
