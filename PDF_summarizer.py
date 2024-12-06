@@ -107,9 +107,10 @@ if uploaded_file is not None:
             # Convert the FAISS index to a retriever
             retriever = RunnablePassthrough(lambda query: retrieve_docs(query))
 
-            # Define a function to format the retrieved documents
             def format_docs(docs):
-                return "\n\n".join(doc.page_content for doc in docs)
+                # Ensure docs are document objects and not strings
+                return "\n\n".join(doc.page_content for doc in docs if hasattr(doc, 'page_content'))
+
 
             # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
             rag_chain = (
