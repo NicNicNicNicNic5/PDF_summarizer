@@ -16,7 +16,6 @@ import tempfile
 
 # Set layout wide
 st.set_page_config(layout='wide')
-col1, col2, col3 = st.columns([1, 2, 1])
 
 # Create title in the center
 st.markdown(
@@ -56,69 +55,93 @@ if uploaded_file is not None:
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
 
-with col2:
-    if st.button("Analyze PDF"):
-        with st.spinner("Analyzing PDF...Please wait!"):
-        # Start local connection to Milvus
-            URI = "http://127.0.0.1:19530"
-            default_server.start()
-            connections.connect(host='127.0.0.1', port=default_server.listen_port)
+# Button CSS
+st.markdown(
+    """
+    <style>
+    .centered-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Full viewport height */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
-            # Create Vector Database
-            vectordb = Milvus.from_documents(
-                documents=splits,
-                embedding=HuggingFaceEmbeddings(
-                    model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
-                ),
-                collection_name="dtsense_streamlit",
-                connection_args={"uri": URI},
-            )
+# Button HTML
+st.markdown(
+    """
+    <div class="centered-button">
+        <button onclick="document.querySelector('button').click()">Analyze PDF</button>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-            # Stop connection to Milvus
-            default_server.stop()
+if st.button("Analyze PDF"):
+    with st.spinner("Analyzing PDF...Please wait!"):
+    # Start local connection to Milvus
+        URI = "http://127.0.0.1:19530"
+        default_server.start()
+        connections.connect(host='127.0.0.1', port=default_server.listen_port)
 
-            # Get API KEY from .env
-            load_dotenv()
+        # Create Vector Database
+        vectordb = Milvus.from_documents(
+            documents=splits,
+            embedding=HuggingFaceEmbeddings(
+                model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
+            ),
+            collection_name="dtsense_streamlit",
+            connection_args={"uri": URI},
+        )
 
-            # Use model with Groq
-            llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ["GROQ_API_KEY"])
+        # Stop connection to Milvus
+        default_server.stop()
 
-            # Define the prompt template for generating AI responses
-            PROMPT_TEMPLATE = """
-            Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
-            Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
-            If you don't know the answer, just say that you don't know, don't try to make up an answer.
-            <context>
-            {context}
-            </context>
+        # Get API KEY from .env
+        load_dotenv()
 
-            <question>
-            {question}
-            </question>
+        # Use model with Groq
+        llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ["GROQ_API_KEY"])
 
-            The response should be specific and use statistics or numbers when possible.
+        # Define the prompt template for generating AI responses
+        PROMPT_TEMPLATE = """
+        Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
+        Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
+        If you don't know the answer, just say that you don't know, don't try to make up an answer.
+        <context>
+        {context}
+        </context>
 
-            Assistant:"""
+        <question>
+        {question}
+        </question>
 
-            # Create a PromptTemplate instance with the defined template and input variables
-            prompt = PromptTemplate(
-                template=PROMPT_TEMPLATE, input_variables=["context", "question"]
-            )
+        The response should be specific and use statistics or numbers when possible.
 
-            # Convert the vector store to a retriever
-            retriever = vectordb.as_retriever()
+        Assistant:"""
 
-            # Define a function to format the retrieved documents
-            def format_docs(docs):
-                return "\n\n".join(doc.page_content for doc in docs)
-            
-            # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
-            rag_chain = (
-                {"context": retriever | format_docs, "question": RunnablePassthrough()}
-                | prompt
-                | llm
-                | StrOutputParser()
-            )
+        # Create a PromptTemplate instance with the defined template and input variables
+        prompt = PromptTemplate(
+            template=PROMPT_TEMPLATE, input_variables=["context", "question"]
+        )
+
+        # Convert the vector store to a retriever
+        retriever = vectordb.as_retriever()
+
+        # Define a function to format the retrieved documents
+        def format_docs(docs):
+            return "\n\n".join(doc.page_content for doc in docs)
+        
+        # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
+        rag_chain = (
+            {"context": retriever | format_docs, "question": RunnablePassthrough()}
+            | prompt
+            | llm
+            | StrOutputParser()
+        )
 
     # finally:
     #     # Delete the temporary file after processing
@@ -129,6 +152,5 @@ with col2:
 text = st.text_area("Text to analyze: ")
 
 # Invoke LLM
-with col2:
-    if st.button("Generate Responses"):
-        st.markdown(rag_chain.invoke(text))
+if st.button("Generate Responses"):
+    st.markdown(rag_chain.invoke(text))
