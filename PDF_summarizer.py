@@ -129,7 +129,6 @@ if done_uploading == True:
                 | StrOutputParser()
             )
         done_analyzing = True
-        done_uploading = False
 
 if done_analyzing == True:
     # Create text box for user
