@@ -49,80 +49,80 @@ if uploaded_file is not None:
         # Split texts into chunks
         splits = text_splitter.split_documents(docs)
 
+        if st.button("Analyze PDF"):
+            # Create embedding using HuggingFace
+            embeddings = HuggingFaceEmbeddings(
+                model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
+            )
+
+            # Generate embeddings for the document chunks using embed_documents()
+            vectors = np.array(embeddings.embed_documents([doc.page_content for doc in splits]), dtype=np.float32)
+
+            # Create a FAISS index
+            dimension = vectors.shape[1]  # Vector dimension
+            index = faiss.IndexFlatL2(dimension)  # L2 distance (Euclidean)
+            index.add(vectors)  # Add vectors to the index
+
+            # Save the index to use for later retrieval
+            faiss.write_index(index, "faiss_index.idx")
+
+            # Load API KEY from .env
+            load_dotenv()
+
+            # Use model with Groq
+            llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ["GROQ_API_KEY"])
+
+            # Define the prompt template for generating AI responses
+            PROMPT_TEMPLATE = """
+            Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
+            Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
+            If you don't know the answer, just say that you don't know, don't try to make up an answer.
+            <context>
+            {context}
+            </context>
+
+            <question>
+            {question}
+            </question>
+
+            The response should be specific and use statistics or numbers when possible.
+
+            Assistant:"""
+
+            # Create a PromptTemplate instance with the defined template and input variables
+            prompt = PromptTemplate(
+                template=PROMPT_TEMPLATE, input_variables=["context", "question"]
+            )
+
+            # Define a function to retrieve the most similar documents using FAISS
+            def retrieve_docs(query):
+                query_vector = embeddings.embed_documents([query]).reshape(1, -1)
+                _, indices = index.search(query_vector, k=5)  # Change `k` for more/less results
+                return [splits[i] for i in indices[0]]
+
+            # Convert the FAISS index to a retriever
+            retriever = RunnablePassthrough(lambda query: retrieve_docs(query))
+
+            # Define a function to format the retrieved documents
+            def format_docs(docs):
+                return "\n\n".join(doc.page_content for doc in docs)
+
+            # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
+            rag_chain = (
+                {"context": retriever | format_docs, "question": RunnablePassthrough()}
+                | prompt
+                | llm
+                | StrOutputParser()
+            )
+
+            # Create text box for user
+            text = st.text_area("Text to analyze: ")
+
+            # Invoke LLM
+            if st.button("Generate Responses"):
+                st.markdown(rag_chain.invoke(text))
+                
     finally:
         # Delete the temporary file after processing
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
-
-    if st.button("Analyze PDF"):
-        # Create embedding using HuggingFace
-        embeddings = HuggingFaceEmbeddings(
-            model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
-        )
-
-        # Generate embeddings for the document chunks using embed_documents()
-        vectors = np.array(embeddings.embed_documents([doc.page_content for doc in splits]), dtype=np.float32)
-
-        # Create a FAISS index
-        dimension = vectors.shape[1]  # Vector dimension
-        index = faiss.IndexFlatL2(dimension)  # L2 distance (Euclidean)
-        index.add(vectors)  # Add vectors to the index
-
-        # Save the index to use for later retrieval
-        faiss.write_index(index, "faiss_index.idx")
-
-        # Load API KEY from .env
-        load_dotenv()
-
-        # Use model with Groq
-        llm = ChatGroq(model_name="llama3-8b-8192", temperature=0, groq_api_key=os.environ["GROQ_API_KEY"])
-
-        # Define the prompt template for generating AI responses
-        PROMPT_TEMPLATE = """
-        Human: You are an AI assistant, and provides answers to questions by using fact based and statistical information when possible.
-        Use the following pieces of information to provide a concise answer to the question enclosed in <question> tags.
-        If you don't know the answer, just say that you don't know, don't try to make up an answer.
-        <context>
-        {context}
-        </context>
-
-        <question>
-        {question}
-        </question>
-
-        The response should be specific and use statistics or numbers when possible.
-
-        Assistant:"""
-
-        # Create a PromptTemplate instance with the defined template and input variables
-        prompt = PromptTemplate(
-            template=PROMPT_TEMPLATE, input_variables=["context", "question"]
-        )
-
-        # Define a function to retrieve the most similar documents using FAISS
-        def retrieve_docs(query):
-            query_vector = embeddings.embed_documents([query]).reshape(1, -1)
-            _, indices = index.search(query_vector, k=5)  # Change `k` for more/less results
-            return [splits[i] for i in indices[0]]
-
-        # Convert the FAISS index to a retriever
-        retriever = RunnablePassthrough(lambda query: retrieve_docs(query))
-
-        # Define a function to format the retrieved documents
-        def format_docs(docs):
-            return "\n\n".join(doc.page_content for doc in docs)
-
-        # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
-        rag_chain = (
-            {"context": retriever | format_docs, "question": RunnablePassthrough()}
-            | prompt
-            | llm
-            | StrOutputParser()
-        )
-
-        # Create text box for user
-        text = st.text_area("Text to analyze: ")
-
-        # Invoke LLM
-        if st.button("Generate Responses"):
-            st.markdown(rag_chain.invoke(text))
