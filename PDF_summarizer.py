@@ -20,7 +20,10 @@ st.set_page_config(layout='wide')
 st.markdown(
     """
     <h1 style="text-align: center; color: white;">
-        PDF Summarizer
+        PDF
+    </h1>
+    <h1 style="text-align: center; color: white;">
+        Summarizer
     </h1>
     """,
     unsafe_allow_html=True
@@ -86,7 +89,7 @@ if uploaded_file is not None:
 
             The response should be specific and use statistics or numbers when possible.
 
-            Don't re-write the questions when providing a generation responses.
+            Don't re-write the questions when providing a generation responses and don't write the <question> tag.
 
             Assistant:"""
 
