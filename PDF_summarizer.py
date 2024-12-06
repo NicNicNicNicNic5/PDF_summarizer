@@ -19,7 +19,7 @@ st.set_page_config(layout='wide')
 # Create title in the center
 st.markdown(
     """
-    <h1 style="text-align: center; color: white; font-size: 10">
+    <h1 style="text-align: center; color: white; font-size: 32px">
         PDF Summarizer
     </h1>
     """,
