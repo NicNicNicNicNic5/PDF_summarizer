@@ -29,6 +29,9 @@ st.markdown(
 # File uploader for PDF
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
+# Create text box for user
+text = st.text_area("Text to analyze: ")
+
 if uploaded_file is not None:
     # Save the uploaded file to a temporary location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
@@ -48,7 +51,7 @@ if uploaded_file is not None:
         # Split texts into chunks
         splits = text_splitter.split_documents(docs)
 
-        if st.button("Analyze PDF"):
+        if st.button("Generate Response"):
             # Create embedding using HuggingFace
             embeddings = HuggingFaceEmbeddings(
                 model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
@@ -113,9 +116,6 @@ if uploaded_file is not None:
                 | llm
                 | StrOutputParser()
             )
-
-            # Create text box for user
-            text = st.text_area("Text to analyze: ")
 
             # Invoke LLM
             if st.button("Generate Responses"):
