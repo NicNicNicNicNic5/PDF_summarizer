@@ -30,7 +30,6 @@ st.markdown(
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
 if uploaded_file is not None:
-
     # Save the uploaded file to a temporary location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
         temp_file_path = temp_file.name
@@ -72,6 +71,11 @@ if st.button("Analyze PDF"):
     # Save the index to use for later retrieval
     faiss.write_index(index, "faiss_index.idx")
 
+# Create text box for user
+text = st.text_area("Text to analyze: ")
+
+# Invoke LLM
+if st.button("Generate Responses"):
     # Load API KEY from .env
     load_dotenv()
 
@@ -120,10 +124,4 @@ if st.button("Analyze PDF"):
         | llm
         | StrOutputParser()
     )
-
-    # Create text box for user
-    text = st.text_area("Text to analyze: ")
-
-    # Invoke LLM
-    if st.button("Generate Responses"):
-        st.markdown(rag_chain.invoke(text))
+    st.markdown(rag_chain.invoke(text))
