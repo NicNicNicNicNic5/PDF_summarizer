@@ -101,7 +101,8 @@ if uploaded_file is not None:
                 # Ensure the output is converted to a NumPy array
                 query_vector = np.array(embeddings.embed_documents([query])).reshape(1, -1)
                 _, indices = index.search(query_vector, k=5)  # Change `k` for more/less results
-                return [splits[i] for i in indices[0]]
+                # Return the document objects based on the indices
+                return [splits[i] for i in indices[0] if i < len(splits)]
 
             # Convert the FAISS index to a retriever
             retriever = RunnablePassthrough(lambda query: retrieve_docs(query))
