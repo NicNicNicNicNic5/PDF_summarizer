@@ -84,7 +84,7 @@ if done_uploading == True:
                 embedding=HuggingFaceEmbeddings(
                     model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
                 ),
-                collection_name="dtsense_streamlit",
+                collection_name="PDF_summarizer",
                 connection_args={"uri": URI},
             )
 
