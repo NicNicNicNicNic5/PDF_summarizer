@@ -62,6 +62,7 @@ if not st.session_state.task_completed:
     st.session_state.task_completed = True 
 
 if st.session_state.task_completed:
+    st.markdown("<br><br>", unsafe_allow_html=True)
     if st.button("Analyze PDF"):
         with st.spinner("Analyzing PDF...Please wait!"):
         # Start local connection to Milvus
