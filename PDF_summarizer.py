@@ -2,13 +2,11 @@
 import streamlit as st
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_milvus import Milvus
 from langchain_huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
 import os
-from langchain_groq import ChatGroq
-# from milvus import default_server
-from pymilvus import connections
+import faiss
+import numpy as np
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -49,8 +47,8 @@ if uploaded_file is not None:
 
         # Create splitter
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size = 1500,
-            chunk_overlap = 150
+            chunk_size=1500,
+            chunk_overlap=150
         )
 
         # Split texts into chunks
@@ -65,33 +63,23 @@ if uploaded_file is not None:
 if done_uploading == True:
     if st.button("Analyze PDF"):
         with st.spinner("Analyzing PDF...Please wait!"):
-        # Start local connection to Milvus
-            URI = "http://localhost:19530"
-            # default_server.start()
-            # connections.connect(host='127.0.0.1', port=default_server.listen_port)
-            # connections.connect(host='localhost', port=19530)
-
-            # connections.disconnect(alias="default")
-            milvus_host = os.getenv("MILVUS_HOST", "localhost")
-            milvus_port = os.getenv("MILVUS_PORT", "19530")
-
-            connections.connect(host=milvus_host, port=milvus_port)
-            # connections.connect(alias="new_connection", host=milvus_host, port=milvus_port)
-
-            # Create Vector Database
-            vectordb = Milvus.from_documents(
-                documents=splits,
-                embedding=HuggingFaceEmbeddings(
-                    model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
-                ),
-                collection_name="PDF_summarizer",
-                connection_args={"uri": URI},
+            # Create embedding using HuggingFace
+            embeddings = HuggingFaceEmbeddings(
+                model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
             )
 
-            # Stop connection to Milvus
-            # default_server.stop()
+            # Generate embeddings for the document chunks
+            vectors = np.array([embeddings.embed(doc.page_content) for doc in splits], dtype=np.float32)
 
-            # Get API KEY from .env
+            # Create a FAISS index
+            dimension = vectors.shape[1]  # Vector dimension
+            index = faiss.IndexFlatL2(dimension)  # L2 distance (Euclidean)
+            index.add(vectors)  # Add vectors to the index
+
+            # Save the index to use for later retrieval
+            faiss.write_index(index, "faiss_index.idx")
+
+            # Load API KEY from .env
             load_dotenv()
 
             # Use model with Groq
@@ -119,13 +107,15 @@ if done_uploading == True:
                 template=PROMPT_TEMPLATE, input_variables=["context", "question"]
             )
 
-            # Convert the vector store to a retriever
-            retriever = vectordb.as_retriever()
+            # Define a function to retrieve the most similar documents using FAISS
+            def retrieve_docs(query):
+                query_vector = embeddings.embed(query).reshape(1, -1)
+                _, indices = index.search(query_vector, k=5)  # Change `k` for more/less results
+                return [splits[i] for i in indices[0]]
 
-            # Define a function to format the retrieved documents
-            def format_docs(docs):
-                return "\n\n".join(doc.page_content for doc in docs)
-            
+            # Convert the FAISS index to a retriever
+            retriever = RunnablePassthrough(lambda query: retrieve_docs(query))
+
             # Define the RAG (Retrieval-Augmented Generation) chain for AI response generation
             rag_chain = (
                 {"context": retriever | format_docs, "question": RunnablePassthrough()}
