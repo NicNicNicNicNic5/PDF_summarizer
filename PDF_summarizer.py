@@ -63,7 +63,6 @@ st.markdown(
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh; /* Full viewport height */
     }
     </style>
     """,
@@ -80,7 +79,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-if st.button("Analyze PDF"):
+if st.button("Analyze PDF", key="hidden_button"):
     with st.spinner("Analyzing PDF...Please wait!"):
     # Start local connection to Milvus
         URI = "http://127.0.0.1:19530"
