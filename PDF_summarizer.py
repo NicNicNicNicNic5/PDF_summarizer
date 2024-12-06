@@ -86,6 +86,8 @@ if uploaded_file is not None:
 
             The response should be specific and use statistics or numbers when possible.
 
+            Don't re-write the questions when providing a generation responses.
+
             Assistant:"""
 
             # Create a PromptTemplate instance with the defined template and input variables
