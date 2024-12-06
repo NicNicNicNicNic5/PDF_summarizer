@@ -17,8 +17,8 @@ import tempfile
 st.set_page_config(layout='wide')
 
 # Set status
-done_uploading = False
-done_analyzing = False
+# done_uploading = False
+# done_analyzing = False
 
 # Create title in the center
 st.markdown(
@@ -34,6 +34,8 @@ st.markdown(
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
 if uploaded_file is not None:
+    # done_uploading = False
+    # done_analyzing = False
     # Save the uploaded file to a temporary location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
         temp_file_path = temp_file.name
@@ -57,9 +59,9 @@ if uploaded_file is not None:
         # Delete the temporary file after processing
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
-        done_uploading = True
+        # done_uploading = True
 
-if done_uploading == True:
+# if done_uploading == True:
     if st.button("Analyze PDF"):
         with st.spinner("Analyzing PDF...Please wait!"):
             # Create embedding using HuggingFace
@@ -126,12 +128,12 @@ if done_uploading == True:
                 | llm
                 | StrOutputParser()
             )
-        done_analyzing = True
+        # done_analyzing = True
 
-if done_analyzing == True:
-    # Create text box for user
-    text = st.text_area("Text to analyze: ")
+# if done_analyzing == True:
+        # Create text box for user
+        text = st.text_area("Text to analyze: ")
 
-    # Invoke LLM
-    if st.button("Generate Responses"):
-        st.markdown(rag_chain.invoke(text))
+        # Invoke LLM
+        if st.button("Generate Responses"):
+            st.markdown(rag_chain.invoke(text))
