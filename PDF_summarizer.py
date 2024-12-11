@@ -19,7 +19,7 @@ st.set_page_config(layout='wide')
 # Create title in the center
 st.markdown(
     """
-    <h1 style="text-align: center; color: white; font-size: 64px">
+    <h1 style="text-align: center; color: white; font-size: 32px">
         PDF Summarizer
     </h1>
     """,
@@ -27,19 +27,12 @@ st.markdown(
 )
 
 # Add description
-st.header("About This Application")
-st.write(
-    "This application allows users to upload a PDF document, process it, and generate AI-assisted summaries or responses based on the content of the document. "
-    "It utilizes state-of-the-art embeddings, document retrieval, and generative AI technologies to provide fact-based and concise answers to user queries."
-)
-
-
 st.write(
     """
-    <p style="text-align: justify; font-size: 14px; line-height: 1.6;">
+    <p style="text-align: justify; font-size: 18px; line-height: 1.6;">
         This application allows users to upload a PDF document, process it, and generate AI-assisted summaries or responses based on the content of the document.
         It utilizes state-of-the-art embeddings, document retrieval, and generative AI technologies to provide fact-based and concise answers to user queries.
-        <br>
+        <br><br>
         How to use the application:
         <ol>
             <li>Upload your PDF</li>
