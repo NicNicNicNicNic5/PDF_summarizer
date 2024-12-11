@@ -168,6 +168,20 @@ st.sidebar.markdown(
         Hi! I'm Nicholas Suardiman, a passionate developer with expertise in Python, AI/ML, and Streamlit applications.
         <br><br>
         I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience.
+        <br><br>
+        This project I created is my final project in Generative AI Engineer (LLM & RAG) class from DTSense.
+    </p>
+    <hr style="border: 1px solid #ccc; margin: 20px 0;">
+    <div style="text-align: center;">
+        <img src="https://raw.githubusercontent.com/NicNicNicNicNic5/PDF_summarizer/main/DTSense.jpeg" 
+             style="border-radius: 50%; width: 150px; height: 150px; margin-bottom: 20px;">
+    </div>
+    <p style="text-align: justify; font-size: 14px; line-height: 1.6;">
+        DTSense Academy is an institution that provides consulting and training services in the field of Information Technology, focusing on Data Science and Artificial Intelligence.
+        <br><br>
+        DTSense Academy also offers various classes, including the Generative AI Engineer (LLM & RAG) class, which I attended.
+        <br><br>
+        In this class, I learned Python from scratch and gained skills to fine-tune LLM models.
     </p>
     """,
     unsafe_allow_html=True
