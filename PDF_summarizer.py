@@ -19,7 +19,7 @@ st.set_page_config(layout='wide')
 # Create title in the center
 st.markdown(
     """
-    <h1 style="text-align: center; color: white; font-size: 32px">
+    <h1 style="text-align: center; color: white; font-size: 64px">
         PDF Summarizer
     </h1>
     """,
@@ -47,6 +47,7 @@ st.write(
             <li>Click [Generate Response] button</li>
         </ol>
     </p>
+    <br>
     """,
     unsafe_allow_html=True
 )
@@ -172,7 +173,7 @@ st.sidebar.markdown(
     </div>
     <p style="text-align: justify; font-size: 14px; line-height: 1.6;">
         Hi! I'm Nicholas Suardiman, a passionate developer with expertise in Python, AI/ML, and Streamlit applications.
-        <br>
+        <br><br>
         I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience.
     </p>
     """,
