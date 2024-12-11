@@ -133,21 +133,34 @@ if uploaded_file is not None:
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
 
-st.sidebar.header("About the Developer")
+# st.sidebar.header("About the Developer")
 
-# Add a profile picture to the sidebar
 st.sidebar.markdown(
     """
-    <div style="text-align: center;">
-        <img src="https://raw.githubusercontent.com/NicNicNicNicNic5/PDF_summarizer/main/myPic.jpeg" 
-             style="border-radius: 50%; width: 150px; height: 150px;">
-    </div>
+    <h1 style="text-align: center; color: white;">
+        About the Developer
+    </h1>
     """,
     unsafe_allow_html=True
 )
 
-# Add biography
-st.sidebar.write(
-    "Hi! I'm Nicholas Suardiman, a passionate developer with expertise in Python, AI/ML, and Streamlit applications. "
-    "I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience."
+# Add a profile picture to the sidebar & biography
+st.sidebar.markdown(
+    """
+    <div style="text-align: center;">
+        <img src="https://raw.githubusercontent.com/NicNicNicNicNic5/PDF_summarizer/main/myPic.jpeg" 
+             style="border-radius: 50%; width: 150px; height: 150px; margin-bottom: 20px;">
+    </div>
+    <p style="text-align: justify; font-size: 14px; line-height: 1.6;">
+        Hi! I'm [Your Name], a passionate developer with expertise in Python, AI/ML, and Streamlit applications. 
+        I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience.
+    </p>
+    """,
+    unsafe_allow_html=True
 )
+
+# # Add biography
+# st.sidebar.write(
+#     "Hi! I'm Nicholas Suardiman, a passionate developer with expertise in Python, AI/ML, and Streamlit applications. "
+#     "I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience."
+# )
