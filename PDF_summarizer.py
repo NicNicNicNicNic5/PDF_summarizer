@@ -26,6 +26,13 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# Add description
+st.header("About This Application")
+st.write(
+    "This application allows users to upload a PDF document, process it, and generate AI-assisted summaries or responses based on the content of the document. "
+    "It utilizes state-of-the-art embeddings, document retrieval, and generative AI technologies to provide fact-based and concise answers to user queries."
+)
+
 # File uploader for PDF
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
@@ -126,28 +133,7 @@ if uploaded_file is not None:
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
 
-# Add description and biography
-st.sidebar.header("About This Application")
-st.sidebar.write(
-    "This application allows users to upload a PDF document, process it, and generate AI-assisted summaries or responses based on the content of the document. "
-    "It utilizes state-of-the-art embeddings, document retrieval, and generative AI technologies to provide fact-based and concise answers to user queries."
-)
-
-# # Add an image in the center of the sidebar
-# developer_image_path = "myPic.jpeg"  # Replace with the path to your image
-# if os.path.exists(developer_image_path):  # Ensure the image file exists
-#     st.sidebar.image(developer_image_path, use_column_width=True, caption="Your Name")
-
-# st.sidebar.write(
-#     "Hi! I'm [Your Name], a passionate developer with expertise in Python, AI/ML, and Streamlit applications. "
-#     "I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience."
-# )
-
 st.sidebar.header("About the Developer")
-st.sidebar.write(
-    "Hi! I'm [Your Name], a passionate developer with expertise in Python, AI/ML, and Streamlit applications. "
-    "I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience."
-)
 
 # Add a profile picture to the sidebar
 st.sidebar.markdown(
@@ -158,4 +144,10 @@ st.sidebar.markdown(
     </div>
     """,
     unsafe_allow_html=True
+)
+
+# Add biography
+st.sidebar.write(
+    "Hi! I'm Nicholas Suardiman, a passionate developer with expertise in Python, AI/ML, and Streamlit applications. "
+    "I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience."
 )
