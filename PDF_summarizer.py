@@ -125,3 +125,16 @@ if uploaded_file is not None:
             # Delete the temporary file after processing
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
+
+# Add description and biography
+st.sidebar.header("About This Application")
+st.sidebar.write(
+    "This application allows users to upload a PDF document, process it, and generate AI-assisted summaries or responses based on the content of the document. "
+    "It utilizes state-of-the-art embeddings, document retrieval, and generative AI technologies to provide fact-based and concise answers to user queries."
+)
+
+st.sidebar.header("About the Developer")
+st.sidebar.write(
+    "Hi! I'm [Your Name], a passionate developer with expertise in Python, AI/ML, and Streamlit applications. "
+    "I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience."
+)
