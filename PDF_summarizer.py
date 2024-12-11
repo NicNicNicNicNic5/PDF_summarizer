@@ -33,6 +33,26 @@ st.write(
     "It utilizes state-of-the-art embeddings, document retrieval, and generative AI technologies to provide fact-based and concise answers to user queries."
 )
 
+
+st.write(
+    """
+    <p style="text-align: justify; font-size: 14px; line-height: 1.6;">
+        This application allows users to upload a PDF document, process it, and generate AI-assisted summaries or responses based on the content of the document.
+        It utilizes state-of-the-art embeddings, document retrieval, and generative AI technologies to provide fact-based and concise answers to user queries.
+        <br>
+        How to use the application:
+        <ol>
+            <li>Upload your PDF</li>
+            <li>Ask the content of the PDF however you like</li>
+            <li>Click [Generate Response] button</li>
+        </ol>
+    </p>
+    """,
+    unsafe_allow_html=True
+)
+
+
+
 # File uploader for PDF
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
@@ -133,8 +153,7 @@ if uploaded_file is not None:
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
 
-# st.sidebar.header("About the Developer")
-
+# Add sidebar title
 st.sidebar.markdown(
     """
     <h1 style="text-align: center; color: white;">
@@ -152,15 +171,10 @@ st.sidebar.markdown(
              style="border-radius: 50%; width: 150px; height: 150px; margin-bottom: 20px;">
     </div>
     <p style="text-align: justify; font-size: 14px; line-height: 1.6;">
-        Hi! I'm [Your Name], a passionate developer with expertise in Python, AI/ML, and Streamlit applications. 
+        Hi! I'm Nicholas Suardiman, a passionate developer with expertise in Python, AI/ML, and Streamlit applications.
+        <br>
         I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience.
     </p>
     """,
     unsafe_allow_html=True
 )
-
-# # Add biography
-# st.sidebar.write(
-#     "Hi! I'm Nicholas Suardiman, a passionate developer with expertise in Python, AI/ML, and Streamlit applications. "
-#     "I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience."
-# )
