@@ -133,12 +133,29 @@ st.sidebar.write(
     "It utilizes state-of-the-art embeddings, document retrieval, and generative AI technologies to provide fact-based and concise answers to user queries."
 )
 
-# Add an image in the center of the sidebar
-developer_image_path = "myPic.jpeg"  # Replace with the path to your image
-if os.path.exists(developer_image_path):  # Ensure the image file exists
-    st.sidebar.image(developer_image_path, use_column_width=True, caption="Your Name")
+# # Add an image in the center of the sidebar
+# developer_image_path = "myPic.jpeg"  # Replace with the path to your image
+# if os.path.exists(developer_image_path):  # Ensure the image file exists
+#     st.sidebar.image(developer_image_path, use_column_width=True, caption="Your Name")
 
+# st.sidebar.write(
+#     "Hi! I'm [Your Name], a passionate developer with expertise in Python, AI/ML, and Streamlit applications. "
+#     "I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience."
+# )
+
+st.sidebar.header("About the Developer")
 st.sidebar.write(
     "Hi! I'm [Your Name], a passionate developer with expertise in Python, AI/ML, and Streamlit applications. "
     "I specialize in building AI-driven solutions that simplify complex workflows and enhance user experience."
+)
+
+# Add a profile picture to the sidebar
+st.sidebar.markdown(
+    """
+    <div style="text-align: center;">
+        <img src="https://raw.githubusercontent.com/NicNicNicNicNic5/PDF_summarizer/main/myPic.jpeg" 
+             style="border-radius: 50%; width: 150px; height: 150px;">
+    </div>
+    """,
+    unsafe_allow_html=True
 )
