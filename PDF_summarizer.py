@@ -16,10 +16,14 @@ import tempfile
 # Set layout wide
 st.set_page_config(layout='wide')
 
+# Detect theme (dark or light mode)
+current_theme = st.get_option("theme.base")
+text_color = "white" if current_theme == "dark" else "black"
+
 # Create title in the center
 st.markdown(
     """
-    <h1 style="text-align: center; color: white; font-size: 32px">
+    <h1 style="text-align: center; color: {text_color}; font-size: 32px">
         PDF Summarizer
     </h1>
     """,
@@ -150,7 +154,7 @@ if uploaded_file is not None:
 # Add sidebar title
 st.sidebar.markdown(
     """
-    <h1 style="text-align: center; color: white;">
+    <h1 style="text-align: center; color: {text_color};">
         About the Developer
     </h1>
     """,
